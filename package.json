@@ -1,0 +1,25 @@
+{
+  "name": "autocomplete-bash-builtins",
+  "main": "./lib/main",
+  "version": "0.0.0",
+  "description": "An autocomplete for bash builtin variables and functions",
+  "keywords": [
+    "bash",
+    "shell",
+    "sh"
+  ],
+  "repository": "https://github.com/atom/bash-builtin-var-complete",
+  "license": "MIT",
+  "engines": {
+    "atom": ">=1.0.0 <2.0.0"
+  },
+  "providedServices": {
+    "autocomplete.provider": {
+      "versions": {
+        "2.0.0": "provide"
+      }
+    }
+  },
+  "dependencies": {
+  }
+}
