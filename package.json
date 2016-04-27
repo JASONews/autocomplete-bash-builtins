@@ -5,6 +5,7 @@
   "description": "An autocomplete for common used bash builtin variables and functions",
   "keywords": [
     "bash",
+    "autocomplete",
     "shell",
     "sh"
   ],
