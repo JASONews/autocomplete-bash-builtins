@@ -11,6 +11,7 @@ module.exports =
   provide: ->
     unless @provider?
       bash_var_provider = require './provider'
-      @provider = new bash_var_provider()
+      bash_dir_provider = require './dirProvider'
+      @provider = [new bash_var_provider(), new bash_dir_provider()]
 
     @provider

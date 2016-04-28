@@ -12,12 +12,10 @@ class bashVarProvider
   excludeLowerPriority: false
 
   getSuggestions: ({editor, bufferPosition, scopeDescriptor, prefix}) ->
-
     if prefix?.length > 0
-      rl = for name, bvar of bvars when bvar.text.startsWith(prefix[0])
-        @buildVariableValue(bvar, prefix)
+        rl = for name, bvar of bvars when bvar.text.startsWith(prefix[0])
+          @buildVariableValue(bvar, prefix)
       return rl
-
     return []
 
   buildVariableValue: (bvar, prefix) ->
