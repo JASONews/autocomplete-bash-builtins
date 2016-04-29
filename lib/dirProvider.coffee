@@ -13,8 +13,8 @@ class bashDirProvider
   filterSuggestions: true
   excludeLowerPriority: false
 
-  regex_fn: /((?:(?:\.\.\/)|(?:\.\/)|\/|(?:\~\/))(?:(?:(?:\\\ )|\w|-|\.)+\/)*)([\w-]*)$/
-  regex_fn_quoted: /((?:(?:\.\.\/)|(?:\.\/)|\/|(?:\~\/))(?:(?:\w|-|\.)(?:\ |\w|-|\.)*\/)*)([\w-\ ]*)$/
+  regex_fn: /((?:(?:\.\.\/)|(?:\.\/)|\/|(?:\~\/))(?:(?:(?:\\\ )|\w|-|\.)+\/)*)((?:[\w\.](?:[\w\.-]|(?:\\\ ))*)*)$/
+  regex_fn_quoted: /((?:(?:\.\.\/)|(?:\.\/)|\/|(?:\~\/))(?:(?:\w|-|\.)(?:\ |\w|-|\.)*\/)*)((?:[\w\.](?:[\w-\.\ ])*)*)$/
 
   getSuggestions: ({editor, bufferPosition, scopeDescriptor}) ->
     [quoted, parent, child] = @getPrefix(editor, bufferPosition, scopeDescriptor)
@@ -23,14 +23,21 @@ class bashDirProvider
       parent = parent.replace(/\\ /g," ")
       if parent.startsWith("~")
         parent = os.homedir() + parent[1..-1]
-      if fs.existsSync(parent)
-        files = fs.readdirSync(path.resolve(parent))
-        rl = for file in files
-          @buildDirValue(file, child, parent, quoted)
+      try
+        unless fs.accessSync(path.resolve(parent), fs.F_OK | fs.R_OK)
+          files = fs.readdirSync(path.resolve(parent))
+          rl = for file in files
+            try
+              @buildDirValue(file, child, parent, quoted, fs.statSync(path.resolve(parent+file)).isDirectory()) unless fs.accessSync(path.resolve(parent+file), fs.F_OK | fs.R_OK)
+            catch err
+              console.log err
+              continue
+      catch err
+        console.log err
+
     return rl
 
   getPrefix: (editor, bufferPosition, scopeDescriptor) ->
-    # Whatever your prefix regex might be
 
     # Get the text for the line up to the triggered buffer position
     line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition])
@@ -41,9 +48,9 @@ class bashDirProvider
       [false].concat(line.match(@regex_fn)?[1..2]) or [false, null, null]
 
 
-  buildDirValue: (file, child, parent, quoted) ->
+  buildDirValue: (file, child, parent, quoted, isDir) ->
     text: if not quoted then file.replace(/\ /g, "\\ ") else file
     type: "constant"
     replacementPrefix: child
-    rightLabel: parent+file
+    rightLabel: if isDir then "Directory" else "File"
     description: parent+file
