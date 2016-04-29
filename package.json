@@ -1,7 +1,7 @@
 {
   "name": "autocomplete-bash-builtins",
   "main": "./lib/main",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "An autocomplete for common used bash builtin variables and functions",
   "keywords": [
     "bash",
