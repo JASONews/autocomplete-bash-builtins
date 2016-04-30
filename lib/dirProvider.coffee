@@ -22,18 +22,20 @@ class bashDirProvider
     if parent
       parent = parent.replace(/\\ /g," ")
       if parent.startsWith("~")
-        parent = os.homedir() + parent[1..-1]
+        parent = path.resolve(os.homedir() + parent[1..-1])
+      else if parent.startsWith(".")
+        parent = path.resolve(editor.getPath(), "../#{parent}/")
       try
         unless fs.accessSync(path.resolve(parent), fs.F_OK | fs.R_OK)
           files = fs.readdirSync(path.resolve(parent))
           rl = for file in files
             try
-              @buildDirValue(file, child, parent, quoted, fs.statSync(path.resolve(parent+file)).isDirectory()) unless fs.accessSync(path.resolve(parent+file), fs.F_OK | fs.R_OK)
+              @buildDirValue(file, child, parent, quoted, fs.statSync(path.resolve("#{parent}/#{file}")).isDirectory()) unless fs.accessSync(path.resolve("#{parent}/#{file}"), fs.F_OK | fs.R_OK)
             catch err
-              console.log err
+              # console.log err
               continue
       catch err
-        console.log err
+        # console.log err
 
     return rl
 
