@@ -25,7 +25,7 @@ class bashDirProvider
         if parent.startsWith("~")
           parent = path.resolve(os.homedir() + parent[1..-1])
         else if parent.startsWith(".")
-          parent = path.resolve(editor.getPath()?, "../#{parent}/")
+          parent = path.resolve(editor.getPath(), "../#{parent}/")
         unless fs.accessSync(path.resolve(parent), fs.F_OK | fs.R_OK)
           files = fs.readdirSync(path.resolve(parent))
           rl = for file in files

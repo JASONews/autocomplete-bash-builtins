@@ -21,3 +21,6 @@
 
 ## 0.3.3- Bug fixed
 * Fixed/path complete throws errors when prefixes are "./" and "../" in unsaved new file
+
+## 0.3.4- Bug fixed
+* Fixed/path complete not working when prefixes are "./" and "../" after bug fixed in 0.3.3
