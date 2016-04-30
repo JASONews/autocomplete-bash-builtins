@@ -20,12 +20,12 @@ class bashDirProvider
     [quoted, parent, child] = @getPrefix(editor, bufferPosition, scopeDescriptor)
     rl = null
     if parent
-      parent = parent.replace(/\\ /g," ")
-      if parent.startsWith("~")
-        parent = path.resolve(os.homedir() + parent[1..-1])
-      else if parent.startsWith(".")
-        parent = path.resolve(editor.getPath(), "../#{parent}/")
       try
+        parent = parent.replace(/\\ /g," ")
+        if parent.startsWith("~")
+          parent = path.resolve(os.homedir() + parent[1..-1])
+        else if parent.startsWith(".")
+          parent = path.resolve(editor.getPath()?, "../#{parent}/")
         unless fs.accessSync(path.resolve(parent), fs.F_OK | fs.R_OK)
           files = fs.readdirSync(path.resolve(parent))
           rl = for file in files
