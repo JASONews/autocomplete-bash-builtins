@@ -15,3 +15,6 @@
 ## 0.3.1- Improvement & Bug fixed
 * Display file type (i.e. File or Directory) on right label
 * Hide files that cannot be accessed by current user in complete list.
+
+## 0.3.2- Bug fixed
+* Fixed/path complete not working as expected for "./" and "../" prefix
