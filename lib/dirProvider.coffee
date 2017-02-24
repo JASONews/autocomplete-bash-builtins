@@ -13,13 +13,18 @@ class bashDirProvider
   filterSuggestions: true
   excludeLowerPriority: false
 
-  regex_fn: /((?:(?:\.\.\/)|(?:\.\/)|\/|(?:\~\/))(?:(?:(?:\\\ )|\w|-|\.)+\/)*)((?:[\w\.](?:[\w\.-]|(?:\\\ ))*)*)$/
-  regex_fn_quoted: /((?:(?:\.\.\/)|(?:\.\/)|\/|(?:\~\/))(?:(?:\w|-|\.)(?:\ |\w|-|\.)*\/)*)((?:[\w\.](?:[\w-\.\ ])*)*)$/
+  # regex_fn: /((?:(?:\.\.\/)|(?:\.\/)|\/|(?:\~\/))(?:(?:(?:\\\ )|\w|-|\.)+\/)*)((?:[\w\.](?:[\w\.-]|(?:\\\ ))*)*)$/
+  # regex_fn_quoted: /((?:(?:\.\.\/)|(?:\.\/)|\/|(?:\~\/))(?:(?:\w|-|\.)(?:\ |\w|-|\.)*\/)*)((?:[\w\.](?:[\w-\.\ ])*)*)$/
+  regex_fn_quoted_v2: /^(?:(?:(?:\w|-|_|\.|\ )*(?:\w|_|-|\ ))|(?:(?:\.\.)|(?:\.)))$/
+  regex_fn_v2: /^(?:(?:(?:\w|-|_|\.|\\\ )*(?:\w|_|-|\\\ ))|(?:(?:\.\.)|(?:\.)))$/
+  regex_dir_v2: /^(?:~|\.\.|\.|)$/
 
   getSuggestions: ({editor, bufferPosition, scopeDescriptor}) ->
     [quoted, parent, child] = @getPrefix(editor, bufferPosition, scopeDescriptor)
     rl = null
     if parent
+      if not (parent.startsWith("/") or parent.startsWith("~"))
+        parent = "./" + parent
       try
         parent = parent.replace(/\\ /g," ")
         if parent.startsWith("~")
@@ -45,10 +50,24 @@ class bashDirProvider
     line = editor.getTextInRange([[bufferPosition.row, 0], bufferPosition])
     # Match the regex to the line, and return the match
     if "string.quoted.double.shell" in scopeDescriptor.scopes
-      [true].concat(line.match(@regex_fn_quoted)?[1..2]) or [true, null, null]
+      @getParent(line, @regex_fn_quoted_v2, true)
     else
-      [false].concat(line.match(@regex_fn)?[1..2]) or [false, null, null]
+      @getParent(line, @regex_fn_v2, false)
 
+  getParent: (line, fn_regex, quoted) ->
+    brks = line.split("/")
+    if brks
+      if brks.length == 1 or not brks[0].match(@regex_dir_v2)
+        return [quoted, null, null]
+      parent = brks[0]+"/"
+      for i in brks[1...-1]
+        if not i.match(fn_regex) and i.length > 0
+          return [quoted, null, null]
+        else
+          parent += i + "/"
+      return [quoted, parent, brks[-1]]
+    else
+      return [quoted, null, null]
 
   buildDirValue: (file, child, parent, quoted, isDir) ->
     text: if not quoted then file.replace(/\ /g, "\\ ") else file

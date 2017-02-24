@@ -10,7 +10,7 @@
   {
     'label': 'Packages'
     'submenu': [
-      'label': 'autocomplete-bash-builtinse'
+      'label': 'autocomplete-bash-builtins'
       'submenu': [
         {
           'label': 'Toggle'
